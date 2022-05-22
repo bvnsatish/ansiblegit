@@ -1,0 +1,33 @@
+me: partion of disk
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+      - name: partion of disk
+        parted:
+          device: /dev/sbd
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: wasvg
+          pvs: /dev/sdd1
+      - name: creating lv
+        lvol:
+           vg: wasvg
+           lv: waslv
+           size: 800m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/wasvg/waslv
+             fstype: ext4
+      - name: mounting the file system
+        mounted:
+             src: /dev/wasvg/waslv
+             path: /was
+             fstype: ext4
+             state: mounted
+
+

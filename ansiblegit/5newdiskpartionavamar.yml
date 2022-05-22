@@ -1,0 +1,34 @@
+---
+
+- name: partion of disk
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+      - name: partion of disk
+        parted:
+          device: /dev/sde
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: avamarvg
+          pvs: /dev/sde1
+      - name: creating lv
+        lvol:
+           vg: avamarvg
+           lv: avamarlv
+           size: 2548m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/avamarvg/avamarlv
+             fstype: xfs
+      - name: mounting the file system
+        mounted:
+             src: /dev/avamarvg/avamarlv
+             path: /avamar
+             fstype: xfs
+             state: mounted
+

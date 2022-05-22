@@ -1,0 +1,14 @@
+---
+
+- name: extending the filesystem
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks: 
+   - name: extending logical volume
+     lvol: 
+      lv: sharelv
+      vg: sharevg
+      size: 2000M
+      force: yes
+      resizefs: true

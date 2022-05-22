@@ -1,0 +1,162 @@
+---
+
+- name: creating disk partion
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks:
+      - name: partion of sdb disk
+        parted:
+          device: /dev/sdb
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: appvg
+          pvs: /dev/sdb1
+      - name: creating lv
+        lvol:
+           vg: appvg
+           lv: applv
+           size: 500m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/appvg/applv
+             fstype: ext4
+      - name: mounting the file system
+        mount:
+            src: /dev/appvg/applv
+            path: /app
+            fstype: ext4
+            state: mounted
+      - name: partion of sdc disk
+        parted:
+          device: /dev/sdc
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: asadminvg
+          pvs: /dev/sdc1
+      - name: creating lv
+        lvol:
+           vg: asadminvg
+           lv: asadminlv
+           size: 1000m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/asadminvg/asadminlv
+             fstype: xfs
+      - name: mounting the file system
+        mount:
+             src: /dev/asadminvg/asadminlv
+             path: /asadmin
+             fstype: xfs
+             state: mounted
+      - name: partion of sdd disk
+        parted:
+          device: /dev/sdd
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: wasvg
+          pvs: /dev/sdd1
+      - name: creating lv
+        lvol:
+           vg: wasvg
+           lv: waslv
+           size: 800m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/wasvg/waslv
+             fstype: ext4
+      - name: mounting the file system
+        mount:
+             src: /dev/wasvg/waslv
+             path: /was
+             fstype: ext4
+             state: mounted
+      - name: partion of sde disk
+        parted:
+          device: /dev/sde
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: avamarvg
+          pvs: /dev/sde1
+      - name: creating lv
+        lvol:
+           vg: avamarvg
+           lv: avamarlv
+           size: 2548m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/avamarvg/avamarlv
+             fstype: xfs
+      - name: mounting the file system
+        mount:
+             src: /dev/avamarvg/avamarlv
+             path: /avamar
+             fstype: xfs
+             state: mounted
+      - name: partion of sdf disk
+        parted:
+          device: /dev/sdf
+          number: 1
+          label: gpt
+          state: present
+      - name: create pv & vg
+        lvg:
+          vg: crmvg
+          pvs: /dev/sdf1
+      - name: creating lv
+        lvol:
+           vg: crmvg
+           lv: crmlv
+           size: 1224m
+           force: yes
+      - name: configuring file system
+        filesystem:
+             dev: /dev/crmvg/crmlv
+             fstype: ext4
+      - name: mounting the file system
+        mount:
+             src: /dev/crmvg/crmlv
+             path: /crmdata
+             fstype: ext4
+             state: mounted
+      - name: ownership change of app
+        file:
+           path: /app
+           owner: appuser
+           group: app
+      - name: ownership change of asadmin
+        file:
+           path: /asadmin
+           owner: asadmin
+           group: asadmin
+      - name: ownership change of was
+        file:
+           path: /was
+           owner: was
+           group: was
+      - name: ownership change of avamar
+        file:
+           path: /avamar
+           owner: avamar
+           group: avamar
+      - name: ownership change of crm
+        file:
+            path: /crmdata
+            owner: crm
+            group: crm

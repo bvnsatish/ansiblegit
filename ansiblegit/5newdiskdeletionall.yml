@@ -1,0 +1,107 @@
+---
+
+- name: creating disk partion
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks:
+      - name: unmounting the file system
+        mount:
+            path: /app
+            state: absent
+      - name: removing of lv
+        lvol:
+          lv: applv
+          vg: appvg
+          state: absent
+          force: yes
+      - name: removing of vg & pv
+        lvg:
+          vg: appvg
+          pvs: /dev/sdb1
+          state: absent
+      - name: removing partion sdb disk
+        parted:
+            device: /dev/sdb
+            number: 1
+            state: absent 
+      - name: unmounting the file system
+        mount:
+            path: /asadmin
+            state: absent
+      - name: removing of lv
+        lvol:
+          lv: asadminlv
+          vg: asadminvg
+          state: absent
+          force: yes
+      - name: removing of vg & pv
+        lvg:
+          vg: asadminvg
+          pvs: /dev/sdc1
+          state: absent
+      - name: removing partion sdc disk
+        parted:
+            device: /dev/sdc
+            number: 1
+            state: absent 
+      - name: unmounting the file system
+        mount:
+            path: /was
+            state: absent
+      - name: removing of lv
+        lvol:
+          lv: waslv
+          vg: wasvg
+          state: absent
+          force: yes
+      - name: removing of vg & pv
+        lvg:
+          vg: wasvg
+          pvs: /dev/sdd1
+          state: absent
+      - name: removing partion sdd disk
+        parted:
+            device: /dev/sdd
+            number: 1
+            state: absent 
+      - name: unmounting the file system
+        mount:
+            path: /avamar
+            state: absent
+      - name: removing of lv
+        lvol:
+          lv: avamarlv
+          vg: avamarvg
+          state: absent
+          force: yes
+      - name: removing of vg & pv
+        lvg:
+          vg: avamarvg
+          pvs: /dev/sde1
+          state: absent
+      - name: removing partion sde disk
+        parted:
+            device: /dev/sde
+            number: 1
+            state: absent 
+      - name: unmounting the file system
+        mount:
+            path: /crmdata
+            state: absent
+      - name: removing of lv
+        lvol:
+          lv: crmlv
+          vg: crmvg
+          state: absent
+          force: yes
+      - name: removing of vg & pv
+        lvg:
+          vg: crmvg
+          pvs: /dev/sdf1
+          state: absent
+      - name: removing partion sdf disk
+        parted:
+            device: /dev/sdf
+            number: 1
+            state: absent 

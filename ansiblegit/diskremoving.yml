@@ -1,0 +1,27 @@
+---
+
+- name: file system destroying
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks: 
+   - name: unmounting file system
+     mount: 
+       path: /sharefs
+       state: unmounted
+   - name: removing lv
+     lvol:
+       lv: sharelv
+       vg: sharevg
+       state: absent
+       force: yes
+   - name: removing vg
+     lvg: 
+      vg: sharevg
+      pvs: /dev/sdb1
+      state: absent
+   - name: removing partition
+     parted:
+       device: /dev/sdb
+       number: 1
+       state: absent

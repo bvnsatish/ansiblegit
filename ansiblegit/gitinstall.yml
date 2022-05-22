@@ -1,0 +1,20 @@
+---
+
+- name: git installation
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks:
+    - name: configuration of git
+      yum: 
+       name: git
+       state: present
+    - name: create a directory for git repository
+      file:
+        name: /gitrepository
+        state: directory
+    - name: takeclone for git
+      git:
+        src: https://github.com/bvnsatish/ansiblegit.git
+        dest: /gitrepository
+    - name: 

@@ -1,0 +1,58 @@
+---
+
+-  name: filesystem configuration 
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: partion of a disk
+       parted:
+        device: /dev/sdb
+        number: 1
+        label: gpt
+        state: present
+     - name: create pv & vg
+       lvg:
+         vg: appvg
+         pvs: /dev/sdb1
+     - name: creating lv
+       lvol:
+          vg: appvg
+          lv: crmlv
+          size: 1024m
+          force: yes
+     - name: configuration filesystem
+       filesystem:
+              dev: /dev/appvg/crmlv
+              fstype: ext4
+     - name: mounting a filesystem
+       mount:
+          src: /dev/appvg/crmlv
+          path: /crmdata
+          fstype: ext4
+          state: mounted
+     - name: creating sybaselv
+       lvol:
+          vg: appvg
+          lv: sybaselv
+          size: 100%FREE
+          force: yes
+     - name: configuring a fs
+       filesystem:
+             dev: /dev/appvg/sybaselv
+             fstype: xfs
+     - name: mounting a filesystem
+       mount:
+         src: /dev/appvg/sybaselv
+         path: /sybasedata
+         fstype: xfs
+         state: mounted
+     - name: permission changing
+       file:
+        path: /crmdata
+        owner: crmuser
+        group: crmdb
+        mode: 0777
+     - name: permission changing
+       file: path=/sybasedata owner=sybaseuser group=sybasedb mode=0777
+

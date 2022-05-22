@@ -1,0 +1,27 @@
+---
+
+-  name: creation of new users
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: creating of app group
+       group: name=app 
+     - name: creating of appuser         
+       user: name=appuser password="appuser@123" comment="appuser@gmail.com" uid=1011 
+     - name: creating of asadmin group
+       group: name=asadmin
+     - name: creating of asadminuser
+       user: name=asadmin password="asadmin@123" comment="asadmin@gmail.com" uid=1022
+     - name: creating was group
+       group: name=was
+     - name: creating of wasuser
+       user: name=was password="was@123" comment="was@gmail.com" uid=1033
+     - name: crating avamar group
+       group: name=avamar
+     - name: creating avamaruser
+       user: name=avamar comment="avamar@gmail.com" uid=1044
+     - name: creating crm group
+       group: name=crm
+     - name: creating crmuser
+       user: name=crm password="crm@123" comment="crm@gmail.com" uid=1055

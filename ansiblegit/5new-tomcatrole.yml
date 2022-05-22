@@ -1,0 +1,7 @@
+---
+- name: all info
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  roles:
+     - 5newall-install

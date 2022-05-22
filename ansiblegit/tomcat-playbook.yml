@@ -1,0 +1,32 @@
+---
+
+- name: downloading and configuring apache-tomcat
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks: 
+   - name: creating path for JAVAHOME
+     file: 
+      path: /oracle/grid
+      state: directory
+     environment:
+       JAVA_HOME: /oracle/grid
+   - name: creating a directory for downloading package
+     file: 
+      path: /usr/local/tomcat
+      state: directory
+   - name: downloading the package
+     get_url: 
+        url: http://mirrors.estointernet.in/apache/tomcat/tomcat-8/v8.5.78/bin/apache-tomcat-8.5.78.tar.gz
+        dest: /usr/local/tomcat
+   - name: extracting file
+     unarchive: 
+        src: /usr/local/tomcat/apache-tomcat-8.5.78.tar.gz
+        dest: /usr/local/tomcat
+        remote_src: yes
+   - name: moving tomcat file
+     command: mv /usr/local/tomcat/apache-tomcat-8.5.78 /oracle/grid
+   - name: starting tomcat
+     command:
+      cmd: /oracle/grid/apache-tomcat-8.5.78/bin/startup.sh
+      

@@ -1,0 +1,86 @@
+---
+
+-  name: configuring tomcat service
+   hosts: appclients
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: installing java packages
+       yum:
+         name: java
+         state: present
+     - name: installing java-jdk package
+       yum:
+        name: java-1.8.0-openjdk-devel
+        state: present
+     - name: creating tomcat group
+       group:
+         name: tomcat
+         gid: 30015
+         state: present
+     - name: creating tomcat user
+       user:
+        name: tomcat
+        uid: 10057
+        group: tomcat
+        home: /opt/tomcat
+        password: '!tomcat@123'
+        state: present
+     - name: creating a downloading path
+       file:
+        path: /opt/tomcat
+        state: directory
+     - name: downloading tomcat file
+       get_url:
+           url: http://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.tar.gz
+           dest: /opt/tomcat
+     - name: extracting tar file
+       unarchive:
+             src: /opt/tomcat/apache-tomcat-9.0.62.tar.gz
+             dest: /opt/tomcat
+             remote_src: true
+     - name: creating soft link for tomcat 
+       file:
+         src: /opt/tomcat/apache-tomcat-9.0.62
+         dest: /opt/tomcat/latest
+         state: link
+     - name: changing ownership of project directory
+       file:
+        path: /opt/tomcat/
+        owner: tomcat
+        recurse: true
+     - name: changing permissions to .sh files
+       file:
+        path: /opt/tomcat/project/bin/
+        mode: u+x,g+x,o+x
+        recurse: true
+     - name: creating tomcat.service file
+       file:
+        path: /etc/systemd/system/tomcat.service
+        state: touch
+     - name: adding entry in tomcat.service file
+       blockinfile:
+              path: /etc/systemd/system/tomcat.service
+              block: |
+                [Unit]
+                Description=Tomcat 9 servlet container
+                After=network.target
+                [Service]
+                Type=forking
+                User=tomcat
+                Group=tomcat
+                Environment="JAVA_HOME=/usr/lib/jvm/jre"
+                Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
+                Environment="CATALINA_BASE=/opt/tomcat/latest"
+                Environment="CATALINA_HOME=/opt/tomcat/latest"
+                Environment="CATALINA_PID=/opt/tomcat/latest/temp/tomcat.pid"
+                Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+                ExecStart=/opt/tomcat/latest/bin/startup.sh
+                ExecStop=/opt/tomcat/latest/bin/shutdown.sh
+                [Install]
+                WantedBy=multi-user.target
+     - name: loading deamon
+       systemd:
+         daemon_reload: yes
+         name: tomcat
+         state: started

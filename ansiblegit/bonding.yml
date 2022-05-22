@@ -1,0 +1,14 @@
+---
+-  name: creating bonding
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks: 
+     - name: ens38 interface file setup
+       copy: src=ifcfg-ens38 dest=/etc/sysconfig/network-scripts
+     - name: ens39 interface file setup
+       copy: src=ifcfg-ens39 dest=/etc/sysconfig/network-scripts
+     - name: bond0 interface file setup
+       copy: src=ifcfg-bond0 dest=/etc/sysconfig/network-scripts
+     - name: restart network
+       service: name=network state=restarted

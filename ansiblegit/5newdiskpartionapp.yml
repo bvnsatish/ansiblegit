@@ -1,0 +1,33 @@
+---
+
+- name: creating disk partion 
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks: 
+     - name: partion of disk
+       parted:
+         device: /dev/sdb
+         number: 1
+         label: gpt
+         state: present
+     - name: create pv & vg
+       lvg:
+         vg: appvg
+         pvs: /dev/sdb1
+     - name: creating lv
+       lvol:
+          vg: appvg
+          lv: applv
+          size: 500m
+          force: yes
+     - name: configuring file system
+       filesystem:
+             dev: /dev/appvg/applv
+             fstype: ext4
+     - name: mounting the file system
+       mounted:
+            src: /dev/appvg/applv
+            path: /app
+            fstype: ext4
+            state: mounted

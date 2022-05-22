@@ -1,0 +1,26 @@
+---
+-  name: httpd installation
+   hosts: all
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: install httpd package
+       yum:
+           name: httpd
+           state: latest
+     - name: copy conf to tmp
+       copy:
+           src: /etc/httpd/conf/httpd.conf
+           dest: /var/tmp
+       notify:
+          - restart httpd service
+     - name: started  httpd service
+       service:
+            name: httpd
+            state: started
+            enabled: yes
+   handlers:
+     - name: restart httpd service
+       service:
+            name: httpd
+            state: restarted  

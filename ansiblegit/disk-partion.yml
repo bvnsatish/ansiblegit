@@ -1,0 +1,42 @@
+---
+
+-  name: diskpartition
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: create 2gb disk partion
+       parted:
+             device: /dev/sdb
+             number: 1
+             state: present
+     - name: creating pv&vg
+       lvg:
+          vg: sharevg
+          pvs: /dev/sdb1
+     - name: creating lv
+       lvol:
+           vg: sharevg
+           lv: sharelv
+           size: 600m
+           force: yes
+     - name: creating mountpoint
+       file:
+           path: /sharefs
+           state: directory
+     - name: configuring the file system
+       filesystem:
+                 fstype: ext4
+                 dev: /dev/sharevg/sharelv
+     - name: mounting the file system
+       mount:
+            path: /sharefs
+            src: /dev/sharevg/sharelv
+            fstype: ext4
+            state: mounted
+     - name: modifying ownership of the mountpoint
+       file:
+           path: /sharefs
+           owner: ansible
+           group: ansible
+           mode: 0770

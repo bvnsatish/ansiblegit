@@ -1,0 +1,8 @@
+---
+
+-  name: filesystem configuration 
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   roles: 
+      - postinstall-tomcat

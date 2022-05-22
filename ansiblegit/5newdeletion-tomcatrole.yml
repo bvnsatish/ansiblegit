@@ -1,0 +1,8 @@
+---
+- name: all deleted info
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  roles:
+     - 5newall-uninstall
+

@@ -1,0 +1,30 @@
+---
+
+-  name: diskpartition
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+
+    - name: delete the entry in fstab
+      mount:
+           path: /sharefs
+           state: absent
+    - name: remove the lv&vg
+      lvol:
+          vg: sharevg
+          lv: sharelv
+          state: absent
+          force: yes
+          
+    - name: remove the lv&pv
+      lvg:
+         vg: sharevg
+         pvs: /dev/sdb1
+         state: absent
+    - name: delete the disk partion
+      parted:
+            device: /dev/sdb
+            number: 1
+            state: absent
+

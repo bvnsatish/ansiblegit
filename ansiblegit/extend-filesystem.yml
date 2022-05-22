@@ -1,0 +1,17 @@
+---
+
+-  name: extend-filesystem
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: extend the lv&vg
+       lvol:
+         vg: sharevg
+         lv: sharelv
+         size: +100%FREE
+     - name: extend of file system
+       filesystem: 
+               dev: /dev/sharevg/sharelv
+               fstype: ext4
+               resizefs: yes

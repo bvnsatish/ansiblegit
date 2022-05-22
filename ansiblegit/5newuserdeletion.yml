@@ -1,0 +1,18 @@
+---
+
+-  name: creation of new users
+   hosts: dbclients
+   remote_user: ansible
+   become: true
+   tasks:
+       -  name: deleting of appuser
+          user: name=appuser uid=1011 state=absent force=yes 
+       -  name: deleting of asadminuser
+          user: name=asadmin uid=1022 state=absent force=yes
+       -  name: deleting of wasuser
+          user: name=was uid=1033 state=absent force=yes
+       -  name: deleting avamaruser
+          user: name=avamar uid=1044 state=absent force=yes
+       -  name: deleting crmuser
+          user: name=crm uid=1055 state=absent force=yes
+

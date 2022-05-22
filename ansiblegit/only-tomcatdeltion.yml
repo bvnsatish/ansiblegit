@@ -1,0 +1,31 @@
+---
+
+- name: tomcat deletion
+  hosts: dbclients
+  remote_user: ansible
+  become: true
+  tasks:
+      - name: stop the tomcat service
+        service:
+             name: tomcat
+             state: stopped
+      - name: delete the tomcatservice file
+        file:
+           path: /etc/systemd/system/tomcat.service
+           state: absent
+      - name: delete the tomcat directory
+        file: 
+           path: /opt/tomcat
+           state: absent
+      - name: delete the tomcat user
+        user:
+           name: tomcat
+           state: absent
+      - name: uninstalling java-jdk package
+        yum:
+         name: "{{ item }}"
+         state: absent
+        with_items: 
+             - java
+             - java-1.8.0-openjdk-devel
+          
